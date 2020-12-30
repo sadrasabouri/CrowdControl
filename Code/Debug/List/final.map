@@ -1,0 +1,72 @@
+RAM Allocation [bytes]
+Variable                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+totalcount6                                                                       0x0260       2
+nobat6                                                                            0x0262       2
+totalcount7                                                                       0x0264       2
+nobat7                                                                            0x0266       2
+TotalCount                                                                        0x0268       2
+badje1                                                                            0x026A       2
+badje2                                                                            0x026C       2
+badje3                                                                            0x026E       2
+badje4                                                                            0x0270       2
+badje5                                                                            0x0272       2
+badje6                                                                            0x0274       2
+badje7                                                                            0x0276       2
+namayesh                                                                          0x0278       2
+d1                                                                                0x027A       2
+d2                                                                                0x027C       2
+d3                                                                                0x027E       2
+d4                                                                                0x0280       2
+d5                                                                                0x0282       2
+d6                                                                                0x0284       2
+d7                                                                                0x0286       2
+entezar                                                                           0x0288       2
+str2                                                                              0x028A      10
+str3                                                                              0x0294      17
+reset                                                                             0x02A5       2
+saat_yekonim                                                                      0x02A7       2
+str1                                                                              0x02A9      10
+lcd_buffer                                                                        0x02B3      17
+_seed                                                                             0x02C4       4
+_base_y                                                                           0x02C8       4
+_lcd_x                                                                            0x02CC       1
+_lcd_y                                                                            0x02CD       1
+_lcd_maxx                                                                         0x02CE       1
+
+EEPROM Allocation [bytes]
+Variable                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                                          Register  Size
+------------------------------------------------------------------------------------------------
+second                                                                            R4,R5        2
+minute                                                                            R6,R7        2
+hour                                                                              R8,R9        2
+totalcount1_5                                                                     R10,R11      2
+nobat1_5                                                                          R12,R13      2
+
+FLASH Allocation [words]
+Function                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+timer1_ovf_isr                                                                    0x00091     44
+ext_int0_isr                                                                      0x000BD    489
+main                                                                              0x002A6     89
+LCD_namayesh_go_to_badje                                                          0x002FF     44
+LCD_namayesh_entezar                                                              0x0032B     35
+GetKey                                                                            0x0034E     78
+put_buff_G100                                                                     0x0039C     64
+_print_G100                                                                       0x003DC    308
+sprintf                                                                           0x00510     52
+strlen                                                                            0x00544     12
+strlenf                                                                           0x00550     13
+itoa                                                                              0x0055D     46
+_lcd_write_nibble_G103                                                            0x0058B     20
+_lcd_write_data                                                                   0x0059F     12
+lcd_gotoxy                                                                        0x005AB     17
+lcd_clear                                                                         0x005BC     14
+lcd_putchar                                                                       0x005CA     32
+lcd_puts                                                                          0x005EA     15
+lcd_putsf                                                                         0x005F9     19
+lcd_init                                                                          0x0060C     47
