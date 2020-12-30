@@ -5,53 +5,59 @@
 #include <stdlib.h>
 #include <alcd.h>
 #include <mega32.h>
-int second  ;
-int minute = 30 ;
-int hour = 7 ;
-int totalcount1_5, nobat1_5 ;
-int totalcount6, nobat6 ;
+
+int second;
+int minute = 30;
+int hour = 7;
+
+int totalcount1_5, nobat1_5;
+int totalcount6, nobat6;
 int totalcount7, nobat7;
-int TotalCount ;
+int TotalCount;
+
 int badje1, badje2, badje3, badje4, badje5, badje6, badje7; 
 int namayesh = 0; 
+
 void LCD_namayesh_go_to_badje (int a, int b);
 char GetKey();
+
 int d1,d2,d3 ,d4,d5,d6 ,d7;
 int entezar;
 void LCD_namayesh_go_to_badje (int a, int b);
 void LCD_namayesh_entezar (int a);
+
 char str2[10];
 char str3[17];
-int reset = 0 ;
+int reset = 0;
 int saat_yekonim;
 char str1[10];
 int namayesh;
 char lcd_buffer[17];
-//=================================================================================================
-// timer interrupt
+
+// Timer Interrupt
 interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 {
-// Reinitialize Timer1 value
-TCNT1H=0x85EE >> 8;
-TCNT1L=0x85EE & 0xff;
-// Place your code here
-if(second==59){
-second=0;
-if(minute==59){
-minute=0;
-if(hour==23)
-hour=0;
-else
-hour++;
+    // Reinitialize Timer1 value
+    TCNT1H = 0x85EE >> 8;
+    TCNT1L = 0x85EE & 0xff;
+    
+    if(second==59){
+        second=0;
+        if(minute==59){
+            minute=0;
+            if(hour==23)
+                hour=0;
+            else
+                hour++;
+        }
+        else
+            minute++;
+    }
+    else
+        second++;
 }
-else
-minute++;
-}
-else
-second++;
-}
-//===================================================================================================
-// External Interrupt 0 service routine
+
+// External Interrupt 0
 interrupt [EXT_INT0] void ext_int0_isr(void)
 {
 char k;
@@ -299,11 +305,14 @@ second = 0 ;
 //======================================================================================
 while (1)
     {
-     sprintf(lcd_buffer,"Clock: %d:%d:%d",hour,minute,second);
-      lcd_gotoxy(0,0);
-      lcd_puts(lcd_buffer);
-      delay_ms(1000);
-      lcd_clear();      
+        if (hour == 1 || hour == 12)
+            sprintf(lcd_buffer,"   %02d:%02d:%02d  PM", hour, minute,second);
+        else
+            sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute,second);
+        lcd_gotoxy(0,0);
+        lcd_puts(lcd_buffer);
+        delay_ms(1000);
+        lcd_clear();      
 }
 }
 //========================================================================================

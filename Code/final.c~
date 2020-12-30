@@ -5,28 +5,35 @@
 #include <stdlib.h>
 #include <alcd.h>
 #include <mega32.h>
-int second  ;
-int minute = 30 ;
-int hour = 7 ;
+
+int second;
+int minute = 30;
+int hour = 7;
+
 int totalcount1_5, nobat1_5 ;
 int totalcount6, nobat6 ;
 int totalcount7, nobat7;
 int TotalCount ;
+
 int badje1, badje2, badje3, badje4, badje5, badje6, badje7; 
 int namayesh = 0; 
+
 void LCD_namayesh_go_to_badje (int a, int b);
 char GetKey();
+
 int d1,d2,d3 ,d4,d5,d6 ,d7;
 int entezar;
 void LCD_namayesh_go_to_badje (int a, int b);
 void LCD_namayesh_entezar (int a);
+
 char str2[10];
 char str3[17];
-int reset = 0 ;
+int reset = 0;
 int saat_yekonim;
 char str1[10];
 int namayesh;
 char lcd_buffer[17];
+
 //=================================================================================================
 // timer interrupt
 interrupt [TIM1_OVF] void timer1_ovf_isr(void)
@@ -330,7 +337,7 @@ void LCD_namayesh_entezar (int a){
     lcd_puts(str1);
     lcd_gotoxy(4, 0);
     lcd_putsf(" nafar joloye shoma hastand"); 
-    delay_ms(30);
+    delay_ms(500);
     lcd_clear();  
 }
 //=========================================================================================
