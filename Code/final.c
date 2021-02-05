@@ -32,7 +32,8 @@ int saat_yekonim;
 int Show;
 char lcd_buffer[17];
 
-// Timer Interrupt
+
+// Timer Interrupt - NOT WORKING
 interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 {
     // Reinitialize Timer1 value
@@ -247,6 +248,7 @@ if(!reset){
         }
     }
 
+
 void main(void)
 {
     DDRB = 0xFF;    //  Port B as output - To LCD
@@ -302,16 +304,16 @@ void main(void)
     second = 0 ; 
     
     while (1)
-        {
-            if (hour == 1 || hour == 12)
-                sprintf(lcd_buffer,"   %02d:%02d:%02d  PM", hour, minute, second);
-            else
-                sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute, second);
-            lcd_gotoxy(0,0);
-            lcd_puts(lcd_buffer);
-            delay_ms(1000);
-            time_after(1000, &hour, &minute, &second);
-            lcd_clear();
+    {
+        if (hour == 1 || hour == 12)
+            sprintf(lcd_buffer,"   %02d:%02d:%02d  PM", hour, minute, second);
+        else
+            sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute, second);
+        lcd_gotoxy(0,0);
+        lcd_puts(lcd_buffer);
+        delay_ms(1000);
+        time_after(1000, &hour, &minute, &second);
+        lcd_clear();
     }
 }
 
