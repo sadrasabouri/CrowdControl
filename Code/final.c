@@ -13,24 +13,19 @@ int minute = 30;
 int hour = 7;
 char is_AM = 1;
 
-int totalcount1_5, turn1_5;
-int totalcount6, turn6;
-int totalcount7, turn7;
-int TotalCount;
-
-//  boolean variables set if the Counter is crowded
-char Counter1, Counter2, Counter3, Counter4, Counter5, Counter6, Counter7; 
+//   fo Counter    1, 2, 3, 4, 5, 6, 7
+char is_full[7] = {0, 0, 0, 0, 0, 0, 0};
+//   fo Counter 1-5, 6, 7
+int in_que[3] = {0 , 0, 0};
+int client_index = 1;
+int is_timeContinue = 1;
 
 void time_after(int, int*, int*, int*, char*);
+int give_first_empty(char*, int);
 void LCD_Goto_Counter (int, int);
 void LCD_Show_Waiting (int);
 void LCD_Out_Of_Time();
 char GetKey();
-
-int d1,d2,d3 ,d4,d5,d6 ,d7;
-int entezar;
-char is_timeContinue = 1;
-
 
 // Timer Interrupt - NOT WORKING
 interrupt [TIM1_OVF] void timer1_ovf_isr(void)
@@ -44,6 +39,7 @@ interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 interrupt [EXT_INT0] void ext_int0_isr(void)
 {
     char key;
+    int empt_counter_idx;
     key = GetKey();
     GICR |= (1 << INTF0);   //  Enalbe Interrupt Flag
     if(key != 0xFF) // dokme feshorde shod 
@@ -57,161 +53,134 @@ interrupt [EXT_INT0] void ext_int0_isr(void)
             case 1:
                 if (is_timeContinue)
                 {
-                    TotalCount += 1;
-                    totalcount1_5 += 1;
-                    if(!Counter1)   //  Is empty
+                    empt_counter_idx = give_first_empty(is_full, 5);
+                    if (empt_counter_idx != -1)
                     {
-                        Counter1 = 1;
-                        turn1_5 += 1;
-                        LCD_Goto_Counter(turn1_5, 1);
+                        is_full[empt_counter_idx] = 1;
+                        LCD_Goto_Counter(client_index, empt_counter_idx + 1);
                     }
-                    else if (!Counter2)
+                    else // All Counters are full
                     {
-                        Counter2 = 1;
-                        turn1_5 += 1;
-                        LCD_Goto_Counter(turn1_5, 2);
-                    }
-                    else if (!Counter3)
-                    {
-                        Counter3 = 1;
-                        turn1_5 += 1;
-                        LCD_Goto_Counter(turn1_5, 3);
-                    }
-                    else if (!Counter4)
-                    {
-                        Counter4 = 1;
-                        turn1_5 += 1;
-                        LCD_Goto_Counter(turn1_5, 4);
-                    }
-                    else if (!Counter5)
-                    {
-                        Counter5 = 1;
-                        turn1_5 += 1;
-                        LCD_Goto_Counter(turn1_5, 5);
-                    }
-                    else    //  No Counter is empty 
-                    {
-                        entezar = totalcount1_5 - turn1_5; 
-                        LCD_Show_Waiting(entezar);
+                        LCD_Show_Waiting(in_que[0]);
+                        in_que[0]++;
                     }
                 }
                 else    //  Running out of time
                     LCD_Out_Of_Time();
                 break;
+                
+            // case 2:
+            //     if(is_timeContinue)
+            //     {
+            //         TotalCount += 1;
+            //         totalcount6 += 1;
+            //         if(!Counter6)
+            //         {
+            //             Counter6 = 1;
+            //             turn6 += 1;
+            //             LCD_Goto_Counter(turn6, 6);
+            //         }
+            //         else
+            //         {
+            //             int entezar6 = totalcount6 - turn6; 
+            //             LCD_Show_Waiting(entezar6);
+            //         }
+            //     }
+            //     else
+            //         LCD_Out_Of_Time();
+            //     break;
 
-            case 2:
-                if(is_timeContinue)
-                {
-                    TotalCount += 1;
-                    totalcount6 += 1;
-                    if(!Counter6)
-                    {
-                        Counter6 = 1;
-                        turn6 += 1;
-                        LCD_Goto_Counter(turn6, 6);
-                    }
-                    else
-                    {
-                        int entezar6 = totalcount6 - turn6; 
-                        LCD_Show_Waiting(entezar6);
-                    }
-                }
-                else
-                    LCD_Out_Of_Time();
-                break;
-
-            case 3: 
-                if(is_timeContinue)
-                {
-                    TotalCount += 1;
-                    totalcount7 += 1;
-                    if(Counter7 == 0){
-                        Counter7 = 1;
-                        turn7 += 1;
-                        LCD_Goto_Counter(turn7, 7);
-                    }
-                    else
-                    {      
-                        int entezar7 = totalcount7 - turn7; 
-                        LCD_Show_Waiting(entezar7);
-                    }
-                }
-                else
-                    LCD_Out_Of_Time();
-                break;
+            // case 3: 
+            //     if(is_timeContinue)
+            //     {
+            //         TotalCount += 1;
+            //         totalcount7 += 1;
+            //         if(Counter7 == 0){
+            //             Counter7 = 1;
+            //             turn7 += 1;
+            //             LCD_Goto_Counter(turn7, 7);
+            //         }
+            //         else
+            //         {      
+            //             int entezar7 = totalcount7 - turn7; 
+            //             LCD_Show_Waiting(entezar7);
+            //         }
+            //     }
+            //     else
+            //         LCD_Out_Of_Time();
+            //     break;
 
             case 9: // Counter1
-                Counter1 = 0;
-                if (totalcount1_5 > turn1_5)
+                is_full[0] = 0;
+                if (in_que[0] > 0)
                 {
-                    d1 = turn1_5 + 1;
-                    LCD_Goto_Counter(d1, 1);
-                    Counter1 = 1;
-                    turn1_5 += 1;
+                    in_que[0]--;
+                    LCD_Goto_Counter(0, 1);
+                    is_full[0] = 1;
                 }
                 break;
 
-            case 8: // Counter2
-                Counter2 = 0;
-                if (totalcount1_5 > turn1_5)
-                {
-                    d2 = turn1_5 + 1;
-                    LCD_Goto_Counter(d2, 2);
-                    Counter2 = 1;
-                    turn1_5 += 1;
-                }
-                break;
+            // case 8: // Counter2
+            //     Counter2 = 0;
+            //     if (totalcount1_5 > turn1_5)
+            //     {
+            //         d2 = turn1_5 + 1;
+            //         LCD_Goto_Counter(d2, 2);
+            //         Counter2 = 1;
+            //         turn1_5 += 1;
+            //     }
+            //     break;
 
-            case 7: // Counter3
-                Counter3 = 0;
-                if (totalcount1_5 > turn1_5)
-                {
-                    d3 = turn1_5 + 1;
-                    LCD_Goto_Counter(d3, 3);
-                    Counter3 = 1;
-                    turn1_5 += 1;
-                }
-                break;
-            case 6: // Counter4
-                Counter4 = 0;
-                if (totalcount1_5 > turn1_5)
-                {
-                    d4 = turn1_5 + 1;
-                    LCD_Goto_Counter(d4, 4) ;
-                    Counter4 = 1;
-                    turn1_5 += 1;
-                }
-                break;
-            case 5: // Counter5
-                Counter5 = 0;
-                if (totalcount1_5 > turn1_5)
-                {
-                    d5 = turn1_5 + 1;
-                    LCD_Goto_Counter(d5, 5);
-                    Counter5 = 1;
-                    turn1_5 += 1;
-                }
-                break;
-            case 4: // Counter6
-                Counter6 = 0;
-                if (totalcount6 > turn6)
-                {
-                    d6 = turn6 + 1;
-                    LCD_Goto_Counter(d6, 6);
-                    Counter6 = 1;
-                    turn6 += 1;
-                }
-                break;
-            case 0: // Counter7
-                Counter7 = 0;
-                if (totalcount7 > turn7)
-                {
-                    d7 = turn7 + 1;
-                    LCD_Goto_Counter(d7, 7);
-                    Counter7 = 1;
-                    turn7 += 1;
-                }
-                break;
+            // case 7: // Counter3
+            //     Counter3 = 0;
+            //     if (totalcount1_5 > turn1_5)
+            //     {
+            //         d3 = turn1_5 + 1;
+            //         LCD_Goto_Counter(d3, 3);
+            //         Counter3 = 1;
+            //         turn1_5 += 1;
+            //     }
+            //     break;
+            // case 6: // Counter4
+            //     Counter4 = 0;
+            //     if (totalcount1_5 > turn1_5)
+            //     {
+            //         d4 = turn1_5 + 1;
+            //         LCD_Goto_Counter(d4, 4) ;
+            //         Counter4 = 1;
+            //         turn1_5 += 1;
+            //     }
+            //     break;
+            // case 5: // Counter5
+            //     Counter5 = 0;
+            //     if (totalcount1_5 > turn1_5)
+            //     {
+            //         d5 = turn1_5 + 1;
+            //         LCD_Goto_Counter(d5, 5);
+            //         Counter5 = 1;
+            //         turn1_5 += 1;
+            //     }
+            //     break;
+            // case 4: // Counter6
+            //     Counter6 = 0;
+            //     if (totalcount6 > turn6)
+            //     {
+            //         d6 = turn6 + 1;
+            //         LCD_Goto_Counter(d6, 6);
+            //         Counter6 = 1;
+            //         turn6 += 1;
+            //     }
+            //     break;
+            // case 0: // Counter7
+            //     Counter7 = 0;
+            //     if (totalcount7 > turn7)
+            //     {
+            //         d7 = turn7 + 1;
+            //         LCD_Goto_Counter(d7, 7);
+            //         Counter7 = 1;
+            //         turn7 += 1;
+            //     }
+            //     break;
         }
     }
 }
@@ -263,12 +232,17 @@ void main(void)
     // Global Enable Interrupts
     #asm("sei")
     
-    totalcount1_5 = 0, turn1_5 = 0;
-    totalcount6 = 0, turn6 = 0;
-    totalcount7 = 0, turn7 = 0;
-    TotalCount = 0;
-    Counter1 = 0, Counter2 = 0, Counter3 = 0, Counter4 = 0, Counter5 = 0, Counter6 = 0, Counter7 = 0;
-    is_timeContinue = 1;
+    is_full[0] = 0;
+    is_full[1] = 0;
+    is_full[2] = 0;
+    is_full[3] = 0;
+    is_full[4] = 0;
+    is_full[5] = 0;
+    is_full[6] = 0;
+
+    in_que[0] = 0;
+    in_que[0] = 0;
+    in_que[0] = 0;
     lcd_init(16);
 
     while (1)
@@ -276,11 +250,11 @@ void main(void)
         if (!is_AM)
             sprintf(lcd_buffer,"   %02d:%02d:%02d  PM", hour, minute, second);
         else
-            sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute, second);
+            sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", is_full[0], in_que[0], second);
         lcd_gotoxy(0,0);
         lcd_puts(lcd_buffer);
         delay_ms(ONE_SEC);
-        time_after(ONE_SEC, &hour, &minute, &second, &is_AM);
+        //time_after(ONE_SEC, &hour, &minute, &second, &is_AM);
         lcd_clear();
     }
 }
@@ -312,6 +286,17 @@ void time_after(int n, int* pthour, int* ptminute, int* ptsecond, char* ptis_AM)
     *ptsecond = second;
     *ptminute = minute;
     *pthour = hour;
+}
+
+int give_first_empty(char* is_full, int to)
+{
+    int i = 0;
+    for (i = 0; i < to; ++i)
+    {
+        if (!is_full[i])
+            return i;   
+    }
+    return -1;
 }
 
 void LCD_Goto_Counter(int clinet_number, int counter_number)
