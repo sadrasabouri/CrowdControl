@@ -15,24 +15,21 @@ int totalcount6, nobat6;
 int totalcount7, nobat7;
 int TotalCount;
 
-int badje1, badje2, badje3, badje4, badje5, badje6, badje7; 
-int namayesh = 0; 
+int Counter1, Counter2, Counter3, Counter4, Counter5, Counter6, Counter7; 
+int Show = 0; 
 
 void time_after(int, int*, int*, int*);
-void LCD_namayesh_go_to_badje (int a, int b);
+void LCD_Goto_Counter (int, int);
 char GetKey();
 
 int d1,d2,d3 ,d4,d5,d6 ,d7;
 int entezar;
-void LCD_namayesh_go_to_badje (int a, int b);
-void LCD_namayesh_entezar (int a);
+void LCD_Goto_Counter (int, int);
+void LCD_Show_entezar (int);
 
-char str2[10];
-char str3[17];
 int reset = 0;
 int saat_yekonim;
-char str1[10];
-int namayesh;
+int Show;
 char lcd_buffer[17];
 
 // Timer Interrupt
@@ -78,47 +75,47 @@ if(!reset){
             if (saat_yekonim) {
                 TotalCount += 1;
                 totalcount1_5 += 1;
-                if(badje1 == 0){
-                    badje1 = 1;
+                if(Counter1 == 0){
+                    Counter1 = 1;
                     nobat1_5 += 1;
-                    namayesh = 1;
-                    LCD_namayesh_go_to_badje(nobat1_5, 1);
-                    namayesh = 0;
+                    Show = 1;
+                    LCD_Goto_Counter(nobat1_5, 1);
+                    Show = 0;
                 
                 }
-                else if (badje2 == 0){
-                    badje2 = 1;
+                else if (Counter2 == 0){
+                    Counter2 = 1;
                     nobat1_5 += 1;
-                    namayesh = 1;
-                    LCD_namayesh_go_to_badje(nobat1_5, 2);
-                    namayesh = 0;
+                    Show = 1;
+                    LCD_Goto_Counter(nobat1_5, 2);
+                    Show = 0;
                 }
-                else if (badje3 == 0){
-                    badje3 = 1;
+                else if (Counter3 == 0){
+                    Counter3 = 1;
                     nobat1_5 += 1;
-                    namayesh = 1;
-                    LCD_namayesh_go_to_badje(nobat1_5, 3);
-                    namayesh = 0;
+                    Show = 1;
+                    LCD_Goto_Counter(nobat1_5, 3);
+                    Show = 0;
                 }
-                else if (badje4 == 0){
-                    badje4 = 1;
+                else if (Counter4 == 0){
+                    Counter4 = 1;
                     nobat1_5 += 1;
-                    namayesh = 1;
-                    LCD_namayesh_go_to_badje(nobat1_5, 4) ;
-                    namayesh = 0;
+                    Show = 1;
+                    LCD_Goto_Counter(nobat1_5, 4) ;
+                    Show = 0;
                 }
-                else if (badje5 == 0){
-                    badje5 = 1;
+                else if (Counter5 == 0){
+                    Counter5 = 1;
                     nobat1_5 += 1;
-                    namayesh = 1;
-                    LCD_namayesh_go_to_badje(nobat1_5, 5);
-                    namayesh = 0;
+                    Show = 1;
+                    LCD_Goto_Counter(nobat1_5, 5);
+                    Show = 0;
                 }
                 else {
-                    namayesh = 1;
+                    Show = 1;
                     entezar = totalcount1_5 - nobat1_5; 
-                    LCD_namayesh_entezar(entezar);
-                    namayesh = 0;
+                    LCD_Show_entezar(entezar);
+                    Show = 0;
                 }
             }    
             break;
@@ -126,16 +123,16 @@ if(!reset){
             if(saat_yekonim){
                 TotalCount += 1;
                 totalcount6 += 1;
-                if(badje6 == 0){
-                    badje6 = 1;
+                if(Counter6 == 0){
+                    Counter6 = 1;
                     nobat6 += 1;
-                    namayesh = 1;
-                    LCD_namayesh_go_to_badje(nobat6, 6);
-                    namayesh = 0;
+                    Show = 1;
+                    LCD_Goto_Counter(nobat6, 6);
+                    Show = 0;
                 }
                 else {
                     int entezar6 = totalcount6 - nobat6; 
-                    LCD_namayesh_entezar(entezar6);
+                    LCD_Show_entezar(entezar6);
                 }
             }
             break;
@@ -143,95 +140,95 @@ if(!reset){
             if(saat_yekonim){
                 TotalCount += 1;
                 totalcount7 += 1;
-                if(badje7 == 0){
-                    badje7 = 1;
+                if(Counter7 == 0){
+                    Counter7 = 1;
                     nobat7 += 1;
-                    namayesh = 1;
-                    LCD_namayesh_go_to_badje(nobat7, 7) ;
-                    namayesh = 0;
+                    Show = 1;
+                    LCD_Goto_Counter(nobat7, 7) ;
+                    Show = 0;
                 }
                 else {
                     
                     int entezar7 = totalcount7 - nobat7; 
-                    LCD_namayesh_entezar(entezar7);
+                    LCD_Show_entezar(entezar7);
                 }
             }
             break;
-        case 9 : //badje1
-            badje1 = 0;
+        case 9 : //Counter1
+            Counter1 = 0;
             if (totalcount1_5 > nobat1_5){
-                namayesh = 1;
+                Show = 1;
                 d1 = nobat1_5 + 1;
-                LCD_namayesh_go_to_badje(d1, 1);
-                badje1 = 1;
+                LCD_Goto_Counter(d1, 1);
+                Counter1 = 1;
                 nobat1_5 += 1;
-                namayesh = 0;
+                Show = 0;
             }
             break;
-        case 8 : //badje2
-            badje2 = 0;
+        case 8 : //Counter2
+            Counter2 = 0;
             if (totalcount1_5 > nobat1_5){
-                namayesh = 1;
+                Show = 1;
                 d2 = nobat1_5 + 1;
-                LCD_namayesh_go_to_badje(d2, 2);
-                badje2 = 1;
+                LCD_Goto_Counter(d2, 2);
+                Counter2 = 1;
                 nobat1_5 += 1;
-                namayesh = 0;
+                Show = 0;
             }
             break;
-        case 7 : //badje3
-            badje3 = 0;
+        case 7 : //Counter3
+            Counter3 = 0;
             if (totalcount1_5 > nobat1_5){
-                namayesh = 1;
+                Show = 1;
                 d3 = nobat1_5 + 1;
-                LCD_namayesh_go_to_badje(d3, 3);
-                badje3 = 1;
+                LCD_Goto_Counter(d3, 3);
+                Counter3 = 1;
                 nobat1_5 += 1;
-                namayesh = 0;
+                Show = 0;
             }
             break;
-        case 6 : //badje4
-            badje4 = 0;
+        case 6 : //Counter4
+            Counter4 = 0;
             if (totalcount1_5 > nobat1_5){
-                namayesh = 1;
+                Show = 1;
                 d4 = nobat1_5 + 1;
-                LCD_namayesh_go_to_badje(d4, 4) ;
-                badje4 = 1;
+                LCD_Goto_Counter(d4, 4) ;
+                Counter4 = 1;
                 nobat1_5 += 1;
-                namayesh = 0;
+                Show = 0;
             }
             break;
-        case 5 : //badje5
-            badje5 = 0;
+        case 5 : //Counter5
+            Counter5 = 0;
             if (totalcount1_5 > nobat1_5){
-                namayesh = 1;
+                Show = 1;
                 d5 = nobat1_5 + 1;
-                LCD_namayesh_go_to_badje(d5, 5);
-                badje5 = 1;
+                LCD_Goto_Counter(d5, 5);
+                Counter5 = 1;
                 nobat1_5 += 1;
-                namayesh = 0;
+                Show = 0;
             }
             break;
-        case 4 : //badje6
-            badje6 = 0;
+        case 4 : //Counter6
+            Counter6 = 0;
             if (totalcount6 > nobat6){
-                namayesh = 1;
+                Show = 1;
                 d6 = nobat6 + 1;
-                LCD_namayesh_go_to_badje(d6, 6);
-                badje6 = 1;
+                LCD_Goto_Counter(d6, 6);
+                Counter6 = 1;
                 nobat6 += 1;
-                namayesh = 0;
+                Show = 0;
             }
             break;
-        case 0 : //badje7
-            badje7 = 0;
+        case 0 : //Counter7
+            Counter7 = 0;
             if (totalcount7 > nobat7){
-                namayesh = 1;
+                Show = 1;
                 d7 = nobat7 + 1;
-                LCD_namayesh_go_to_badje(d7, 7);
-                badje7 = 1;
+                LCD_Goto_Counter(d7, 7);
+                Counter7 = 1;
                 nobat7 += 1;
-                namayesh = 0;
+                Show = 0;
             }
             break;
         
@@ -244,8 +241,8 @@ if(!reset){
             totalcount6 = 0, nobat6 = 0;
             totalcount7 = 0, nobat7 = 0;
             TotalCount = 0;
-            badje1 = 0, badje2 = 0, badje3 = 0, badje4 = 0, badje5 = 0, badje6 = 0, badje7 = 0; 
-            namayesh = 0; 
+            Counter1 = 0, Counter2 = 0, Counter3 = 0, Counter4 = 0, Counter5 = 0, Counter6 = 0, Counter7 = 0; 
+            Show = 0; 
             //tanzimat saat
         }
     }
@@ -298,8 +295,8 @@ void main(void)
     totalcount6 = 0, nobat6 = 0;
     totalcount7 = 0, nobat7 = 0;
     TotalCount = 0;
-    badje1 = 0, badje2 = 0, badje3 = 0, badje4 = 0, badje5 = 0, badje6 = 0, badje7 = 0; 
-    namayesh = 0; 
+    Counter1 = 0, Counter2 = 0, Counter3 = 0, Counter4 = 0, Counter5 = 0, Counter6 = 0, Counter7 = 0; 
+    Show = 0; 
     saat_yekonim = 0;
     lcd_init(16);
     second = 0 ; 
@@ -344,37 +341,44 @@ void time_after(int n, int* pthour, int* ptminute, int* ptsecond)
     *pthour = hour;
 }
 
-void LCD_namayesh_go_to_badje (int a, int b)
+void LCD_Goto_Counter(int clinet_number, int counter_number)
 {
-    lcd_clear(); 
-    str1[10];
-    itoa(a, str1);
-    lcd_gotoxy(0, 0);
-    lcd_puts(str1);
-    lcd_gotoxy(5, 0);
-    lcd_putsf("go to badje : ");
-    itoa(b, str2);
-    lcd_gotoxy(15, 0);
-    lcd_puts(str2);
-    delay_ms(1000);
-    lcd_clear(); 
-}
-//==========================================================================================
-void LCD_namayesh_entezar (int a){
+    char* tmp_buffer = "";
+
     lcd_clear();
-    str3[17];
-    itoa(a, str3);
+    
+    sprintf(tmp_buffer,"   Client #%03d   ", clinet_number);
     lcd_gotoxy(0, 0);
-    lcd_puts(str1);
-    lcd_gotoxy(4, 0);
-    lcd_putsf(" nafar joloye shoma hastand"); 
-    delay_ms(500);
+    lcd_puts(tmp_buffer);
+
+    sprintf(tmp_buffer,"Go To Counter#%02d!", counter_number);
+    lcd_gotoxy(0, 1);
+    lcd_puts(tmp_buffer);
+
+    delay_ms(3000);
+    time_after(3000, &hour, &minute, &second);
+    lcd_clear();
+}
+
+void LCD_Show_entezar(int togo_number)
+{
+    char* tmp_buffer = "";
+
+    lcd_clear();
+
+    sprintf(tmp_buffer," %3d Client(s) ", togo_number);
+    lcd_gotoxy(0, 0);
+    lcd_puts(tmp_buffer);
+ 
+    sprintf(tmp_buffer,"   Before You   ", togo_number);
+    lcd_gotoxy(0, 1);
+    lcd_puts(tmp_buffer);
+
+    delay_ms(3000);
+    time_after(3000, &hour, &minute, &second);
     lcd_clear();  
 }
-//=========================================================================================
 
-
-//=========================================================================================
 char GetKey()
 {
 unsigned char key_code = 0xFF;
