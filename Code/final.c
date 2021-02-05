@@ -6,9 +6,12 @@
 #include <alcd.h>
 #include <mega32.h>
 
-int second;
+#define ONE_SEC 1000
+#define SHOW_DELAY 3000
+int second = 0;
 int minute = 30;
 int hour = 7;
+char is_AM = 1;
 
 int totalcount1_5, nobat1_5;
 int totalcount6, nobat6;
@@ -18,7 +21,7 @@ int TotalCount;
 int Counter1, Counter2, Counter3, Counter4, Counter5, Counter6, Counter7; 
 int Show = 0; 
 
-void time_after(int, int*, int*, int*);
+void time_after(int, int*, int*, int*, char*);
 void LCD_Goto_Counter (int, int);
 char GetKey();
 
@@ -36,7 +39,7 @@ char lcd_buffer[17];
 // Timer Interrupt - NOT WORKING
 interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 {
-    // Reinitialize Timer1 value
+    // Reinitialize Timer1 Value
     TCNT1H = 0x85EE >> 8;
     TCNT1L = 0x85EE & 0xff;
     
@@ -301,29 +304,28 @@ void main(void)
     Show = 0; 
     saat_yekonim = 0;
     lcd_init(16);
-    second = 0 ; 
-    
+
     while (1)
     {
-        if (hour == 1 || hour == 12)
+        if (!is_AM)
             sprintf(lcd_buffer,"   %02d:%02d:%02d  PM", hour, minute, second);
         else
             sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute, second);
         lcd_gotoxy(0,0);
         lcd_puts(lcd_buffer);
-        delay_ms(1000);
-        time_after(1000, &hour, &minute, &second);
+        delay_ms(ONE_SEC);
+        time_after(ONE_SEC, &hour, &minute, &second, &is_AM);
         lcd_clear();
     }
 }
 
-void time_after(int n, int* pthour, int* ptminute, int* ptsecond)
+void time_after(int n, int* pthour, int* ptminute, int* ptsecond, char* ptis_AM)
 {
     unsigned char second = *ptsecond;
     unsigned char minute = *ptminute;
     unsigned char hour = *pthour;
 
-    n = n / 1000;
+    n = n / ONE_SEC;
     second += n;
     if (second > 59)
     {
@@ -336,7 +338,10 @@ void time_after(int n, int* pthour, int* ptminute, int* ptsecond)
         minute = minute % 60;
     }
     if (hour > 12)
+    {
         hour = hour % 12;
+        *ptis_AM = *ptis_AM ? 0 : 1;    //  is_AM = ~is_AM
+    }
 
     *ptsecond = second;
     *ptminute = minute;
@@ -357,8 +362,8 @@ void LCD_Goto_Counter(int clinet_number, int counter_number)
     lcd_gotoxy(0, 1);
     lcd_puts(tmp_buffer);
 
-    delay_ms(3000);
-    time_after(3000, &hour, &minute, &second);
+    delay_ms(SHOW_DELAY);
+    time_after(SHOW_DELAY, &hour, &minute, &second, &is_AM);
     lcd_clear();
 }
 
@@ -376,9 +381,9 @@ void LCD_Show_Waiting(int togo_number)
     lcd_gotoxy(0, 1);
     lcd_puts(tmp_buffer);
 
-    delay_ms(3000);
-    time_after(3000, &hour, &minute, &second);
-    lcd_clear();  
+    delay_ms(SHOW_DELAY);
+    time_after(SHOW_DELAY, &hour, &minute, &second, &is_AM);
+    lcd_clear();
 }
 
 char GetKey()
