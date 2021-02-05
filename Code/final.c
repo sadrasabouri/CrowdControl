@@ -25,7 +25,7 @@ char GetKey();
 int d1,d2,d3 ,d4,d5,d6 ,d7;
 int entezar;
 void LCD_Goto_Counter (int, int);
-void LCD_Show_entezar (int);
+void LCD_Show_Waiting (int);
 
 int reset = 0;
 int saat_yekonim;
@@ -114,7 +114,7 @@ if(!reset){
                 else {
                     Show = 1;
                     entezar = totalcount1_5 - nobat1_5; 
-                    LCD_Show_entezar(entezar);
+                    LCD_Show_Waiting(entezar);
                     Show = 0;
                 }
             }    
@@ -132,7 +132,7 @@ if(!reset){
                 }
                 else {
                     int entezar6 = totalcount6 - nobat6; 
-                    LCD_Show_entezar(entezar6);
+                    LCD_Show_Waiting(entezar6);
                 }
             }
             break;
@@ -150,7 +150,7 @@ if(!reset){
                 else {
                     
                     int entezar7 = totalcount7 - nobat7; 
-                    LCD_Show_entezar(entezar7);
+                    LCD_Show_Waiting(entezar7);
                 }
             }
             break;
@@ -360,7 +360,7 @@ void LCD_Goto_Counter(int clinet_number, int counter_number)
     lcd_clear();
 }
 
-void LCD_Show_entezar(int togo_number)
+void LCD_Show_Waiting(int togo_number)
 {
     char* tmp_buffer = "";
 
@@ -381,54 +381,58 @@ void LCD_Show_entezar(int togo_number)
 
 char GetKey()
 {
-unsigned char key_code = 0xFF;
-unsigned char columns;
+    unsigned char key_code = 0xFF;
+    unsigned char columns;
 
-PORTC = 0xFF; 
-// first row
-PORTC.4 = 0;
-columns = PINC & 0x07;
-if(columns != 0x07)
-  {
-  switch(columns)
-    {
-    case 0b110 : key_code = 1; break;
-    case 0b101 : key_code = 2; break;
-    case 0b011 : key_code = 3; break;
-    }
-  }  
-PORTC.4 = 1;
-// second row
-PORTC.5 = 0;
-columns = PINC & 0x07;
-if(columns != 0x07)
-  {
-  switch(columns)
-    {
-    case 0b110 : key_code = 4; break;
-    case 0b101 : key_code = 5; break;
-    case 0b011 : key_code = 6; break;
-    }
-  }  
-PORTC.5 = 1;
-// third row
-PORTC.6 = 0;
-columns = PINC & 0x07;
-if(columns != 0x07)
-  {
-  switch(columns)
-    {
-    case 0b110 : key_code = 7; break;
-    case 0b101 : key_code = 8; break;
-    case 0b011 : key_code = 9; break;
-    }
-  }  
-PORTC.6 = 1;
-// fourth row
-PORTC.7 = 0;
-if(!PINC.1) key_code = 0;
-PORTC.7 = 1;
+    PORTC = 0xFF;
 
-PORTC = 0x0F;
-return key_code;
+    // First Row
+    PORTC.4 = 0;
+    columns = PINC & 0x07;
+    if(columns != 0x07)
+    {
+    switch(columns)
+        {
+        case 0b110 : key_code = 1; break;
+        case 0b101 : key_code = 2; break;
+        case 0b011 : key_code = 3; break;
+        }
+    }  
+    PORTC.4 = 1;
+    
+    // Second Row
+    PORTC.5 = 0;
+    columns = PINC & 0x07;
+    if(columns != 0x07)
+    {
+    switch(columns)
+        {
+        case 0b110 : key_code = 4; break;
+        case 0b101 : key_code = 5; break;
+        case 0b011 : key_code = 6; break;
+        }
+    }  
+    PORTC.5 = 1;
+
+    // Third Row
+    PORTC.6 = 0;
+    columns = PINC & 0x07;
+    if(columns != 0x07)
+    {
+    switch(columns)
+        {
+        case 0b110 : key_code = 7; break;
+        case 0b101 : key_code = 8; break;
+        case 0b011 : key_code = 9; break;
+        }
+    }  
+    PORTC.6 = 1;
+    
+    // Fourth Row
+    PORTC.7 = 0;
+    if(!PINC.1) key_code = 0;
+    PORTC.7 = 1;
+
+    PORTC = 0x0F;
+    return key_code;
 }
