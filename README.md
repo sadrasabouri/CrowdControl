@@ -42,3 +42,11 @@ When there is no message to be informed, LCD should show current time. Work hour
 
 ## Technical Detail
 
+There is interrupt service routine wich handles inputted keys (which can be easily understand how it's work from above picture - pressing on any key will fall `INT0` from `VCC` to `GND` so interuppt will be called and it will figure out which key has been pressed by changing the input/output side of the keypad -).
+
+Also LCD system is widely used in any microprocessor project.
+
+For controling the turning submissions we need a memory for remembering which customer submited turn for which type of counters, so we used `que` type memory wich is just like `stack` but `FIFO`.
+By this structure we will save any turn request after all the desired type of counters are full (`push`ing into que), then `pop`ing from it after each counter keypress.
+
+Also for each turn submission in `#1` to `#5` set, there is a mechanism that checks counters from `#1` to `#5` and inform if one of them is empty, if not early consideration will be taken.
