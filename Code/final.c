@@ -8,6 +8,7 @@
 
 #define ONE_SEC 1000
 #define SHOW_DELAY 3000
+#define MAX_IN_QUE 100
 int second = 0;
 int minute = 30;
 int hour = 7;
@@ -17,9 +18,15 @@ char is_AM = 1;
 char is_full[7] = {0, 0, 0, 0, 0, 0, 0};
 //   fo Counter 1-5, 6, 7
 int in_que[3] = {0 , 0, 0};
-int client_index = 1;
+int que_1to5[MAX_IN_QUE] = {0};
+int que_6[MAX_IN_QUE] = {0};
+int que_7[MAX_IN_QUE] = {0}; 
+int client_index = 0;
 int is_timeContinue = 1;
+char lcd_buffer[16];
 
+int pop_from_que(int*);
+void push_to_que(int*, int);
 void time_after(int, int*, int*, int*, char*);
 int give_first_empty(char*, int);
 void LCD_Goto_Counter (int, int);
@@ -53,6 +60,7 @@ interrupt [EXT_INT0] void ext_int0_isr(void)
             case 1:
                 if (is_timeContinue)
                 {
+                    client_index++;
                     empt_counter_idx = give_first_empty(is_full, 5);
                     if (empt_counter_idx != -1)
                     {
@@ -63,133 +71,152 @@ interrupt [EXT_INT0] void ext_int0_isr(void)
                     {
                         LCD_Show_Waiting(in_que[0]);
                         in_que[0]++;
+                        push_to_que(que_1to5, client_index);
                     }
                 }
                 else    //  Running out of time
                     LCD_Out_Of_Time();
                 break;
-                
-            // case 2:
-            //     if(is_timeContinue)
-            //     {
-            //         TotalCount += 1;
-            //         totalcount6 += 1;
-            //         if(!Counter6)
-            //         {
-            //             Counter6 = 1;
-            //             turn6 += 1;
-            //             LCD_Goto_Counter(turn6, 6);
-            //         }
-            //         else
-            //         {
-            //             int entezar6 = totalcount6 - turn6; 
-            //             LCD_Show_Waiting(entezar6);
-            //         }
-            //     }
-            //     else
-            //         LCD_Out_Of_Time();
-            //     break;
 
-            // case 3: 
-            //     if(is_timeContinue)
-            //     {
-            //         TotalCount += 1;
-            //         totalcount7 += 1;
-            //         if(Counter7 == 0){
-            //             Counter7 = 1;
-            //             turn7 += 1;
-            //             LCD_Goto_Counter(turn7, 7);
-            //         }
-            //         else
-            //         {      
-            //             int entezar7 = totalcount7 - turn7; 
-            //             LCD_Show_Waiting(entezar7);
-            //         }
-            //     }
-            //     else
-            //         LCD_Out_Of_Time();
-            //     break;
+            case 2:
+                if (is_timeContinue)
+                {
+                    client_index++;
+                    if (!is_full[5]) //  Counter 6
+                    {
+                        is_full[5] = 1;
+                        LCD_Goto_Counter(client_index, 6);
+                    }
+                    else // All Counters are full
+                    {
+                        LCD_Show_Waiting(in_que[1]);
+                        in_que[1]++;
+                        push_to_que(que_6, client_index);
+                    }
+                }
+                else    //  Running out of time
+                    LCD_Out_Of_Time();
+                break;
+
+            case 3:
+                if (is_timeContinue)
+                {
+                    client_index++;
+                    if (!is_full[6]) //  Counter 7
+                    {
+                        is_full[6] = 1;
+                        LCD_Goto_Counter(client_index, 7);
+                    }
+                    else // All Counters are full
+                    {
+                        LCD_Show_Waiting(in_que[2]);
+                        in_que[2]++;
+                        push_to_que(que_7, client_index);
+                    }
+                }
+                else    //  Running out of time
+                    LCD_Out_Of_Time();
+                break;
 
             case 9: // Counter1
                 is_full[0] = 0;
                 if (in_que[0] > 0)
                 {
                     in_que[0]--;
-                    LCD_Goto_Counter(0, 1);
+                    LCD_Goto_Counter(pop_from_que(que_1to5), 1);
                     is_full[0] = 1;
                 }
                 break;
 
-            // case 8: // Counter2
-            //     Counter2 = 0;
-            //     if (totalcount1_5 > turn1_5)
-            //     {
-            //         d2 = turn1_5 + 1;
-            //         LCD_Goto_Counter(d2, 2);
-            //         Counter2 = 1;
-            //         turn1_5 += 1;
-            //     }
-            //     break;
+            case 8: // Counter2
+                is_full[1] = 0;
+                if (in_que[0] > 0)
+                {
+                    in_que[0]--;
+                    LCD_Goto_Counter(pop_from_que(que_1to5), 2);
+                    is_full[1] = 1;
+                }
+                break;
 
-            // case 7: // Counter3
-            //     Counter3 = 0;
-            //     if (totalcount1_5 > turn1_5)
-            //     {
-            //         d3 = turn1_5 + 1;
-            //         LCD_Goto_Counter(d3, 3);
-            //         Counter3 = 1;
-            //         turn1_5 += 1;
-            //     }
-            //     break;
-            // case 6: // Counter4
-            //     Counter4 = 0;
-            //     if (totalcount1_5 > turn1_5)
-            //     {
-            //         d4 = turn1_5 + 1;
-            //         LCD_Goto_Counter(d4, 4) ;
-            //         Counter4 = 1;
-            //         turn1_5 += 1;
-            //     }
-            //     break;
-            // case 5: // Counter5
-            //     Counter5 = 0;
-            //     if (totalcount1_5 > turn1_5)
-            //     {
-            //         d5 = turn1_5 + 1;
-            //         LCD_Goto_Counter(d5, 5);
-            //         Counter5 = 1;
-            //         turn1_5 += 1;
-            //     }
-            //     break;
-            // case 4: // Counter6
-            //     Counter6 = 0;
-            //     if (totalcount6 > turn6)
-            //     {
-            //         d6 = turn6 + 1;
-            //         LCD_Goto_Counter(d6, 6);
-            //         Counter6 = 1;
-            //         turn6 += 1;
-            //     }
-            //     break;
-            // case 0: // Counter7
-            //     Counter7 = 0;
-            //     if (totalcount7 > turn7)
-            //     {
-            //         d7 = turn7 + 1;
-            //         LCD_Goto_Counter(d7, 7);
-            //         Counter7 = 1;
-            //         turn7 += 1;
-            //     }
-            //     break;
+            case 7: // Counter3
+                is_full[2] = 0;
+                if (in_que[0] > 0)
+                {
+                    in_que[0]--;
+                    LCD_Goto_Counter(pop_from_que(que_1to5), 3);
+                    is_full[2] = 1;
+                }
+                break;
+            case 6: // Counter4
+                is_full[3] = 0;
+                if (in_que[0] > 0)
+                {
+                    in_que[0]--;
+                    LCD_Goto_Counter(pop_from_que(que_1to5), 4);
+                    is_full[3] = 1;
+                }
+                break;
+            case 5: // Counter5
+                is_full[4] = 0;
+                if (in_que[0] > 0)
+                {
+                    in_que[0]--;
+                    LCD_Goto_Counter(pop_from_que(que_1to5), 5);
+                    is_full[4] = 1;
+                }
+                break;
+            case 4: // Counter6
+                is_full[5] = 0;
+                if (in_que[1] > 0)
+                {
+                    in_que[1]--;
+                    LCD_Goto_Counter(pop_from_que(que_6), 6);
+                    is_full[5] = 1;
+                }
+                break;
+            case 0: // Counter7
+                is_full[6] = 0;
+                if (in_que[2] > 0)
+                {
+                    in_que[2]--;
+                    LCD_Goto_Counter(pop_from_que(que_7), 7);
+                    is_full[6] = 1;
+                }
+                break;
         }
     }
 }
 
+void push_to_que(int* que, int who)
+{
+    int i = 0;
+    for(i = 0; i < MAX_IN_QUE; ++i)
+    {
+        if (que[i] == 0)
+        {
+            que[i] = who;
+            return;  
+        }
+    }
+    return;  //  Que overflow
+}
+
+int pop_from_que(int* que)
+{
+    int i = 0, value = 0;
+    if (que[0] == 0)
+        return -1;
+    value = que[0];
+    while (que[i])
+    {
+        que[i] = que[i+1];
+        i++;
+    }
+    return value;
+}
 
 void main(void)
 {
-    char* lcd_buffer = "";
-
     DDRB = 0xFF;    //  Port B as output - To LCD
     PORTB = 0x00;   //  Initialize it by 0000_0000
     DDRC = 0xF0;    //  Port C as half input half output - From Keypad
@@ -231,18 +258,6 @@ void main(void)
 
     // Global Enable Interrupts
     #asm("sei")
-    
-    is_full[0] = 0;
-    is_full[1] = 0;
-    is_full[2] = 0;
-    is_full[3] = 0;
-    is_full[4] = 0;
-    is_full[5] = 0;
-    is_full[6] = 0;
-
-    in_que[0] = 0;
-    in_que[0] = 0;
-    in_que[0] = 0;
     lcd_init(16);
 
     while (1)
@@ -250,11 +265,11 @@ void main(void)
         if (!is_AM)
             sprintf(lcd_buffer,"   %02d:%02d:%02d  PM", hour, minute, second);
         else
-            sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", is_full[0], in_que[0], second);
+            sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute, second);
         lcd_gotoxy(0,0);
         lcd_puts(lcd_buffer);
         delay_ms(ONE_SEC);
-        //time_after(ONE_SEC, &hour, &minute, &second, &is_AM);
+        time_after(ONE_SEC, &hour, &minute, &second, &is_AM);
         lcd_clear();
     }
 }
@@ -301,17 +316,15 @@ int give_first_empty(char* is_full, int to)
 
 void LCD_Goto_Counter(int clinet_number, int counter_number)
 {
-    char* tmp_buffer = "";
-
     lcd_clear();
     
-    sprintf(tmp_buffer,"   Client #%03d   ", clinet_number);
+    sprintf(lcd_buffer,"   Client #%03d   ", clinet_number);
     lcd_gotoxy(0, 0);
-    lcd_puts(tmp_buffer);
+    lcd_puts(lcd_buffer);
 
-    sprintf(tmp_buffer,"Go To Counter#%02d!", counter_number);
+    sprintf(lcd_buffer,"Go To Counter#%02d!", counter_number);
     lcd_gotoxy(0, 1);
-    lcd_puts(tmp_buffer);
+    lcd_puts(lcd_buffer);
 
     delay_ms(SHOW_DELAY);
     time_after(SHOW_DELAY, &hour, &minute, &second, &is_AM);
@@ -320,17 +333,15 @@ void LCD_Goto_Counter(int clinet_number, int counter_number)
 
 void LCD_Show_Waiting(int togo_number)
 {
-    char* tmp_buffer = "";
-
     lcd_clear();
 
-    sprintf(tmp_buffer," %3d Client(s) ", togo_number);
+    sprintf(lcd_buffer," %3d Client(s) ", togo_number);
     lcd_gotoxy(0, 0);
-    lcd_puts(tmp_buffer);
+    lcd_puts(lcd_buffer);
  
-    sprintf(tmp_buffer,"   Before You   ", togo_number);
+    sprintf(lcd_buffer,"   Before You   ", togo_number);
     lcd_gotoxy(0, 1);
-    lcd_puts(tmp_buffer);
+    lcd_puts(lcd_buffer);
 
     delay_ms(SHOW_DELAY);
     time_after(SHOW_DELAY, &hour, &minute, &second, &is_AM);
@@ -339,17 +350,17 @@ void LCD_Show_Waiting(int togo_number)
 
 void LCD_Out_Of_Time()
 {
-    char* tmp_buffer = "";
+    char* lcd_buffer = "";
 
     lcd_clear();
 
-    sprintf(tmp_buffer,"    Sorry :(    ");
+    sprintf(lcd_buffer,"    Sorry :(    ");
     lcd_gotoxy(0, 0);
-    lcd_puts(tmp_buffer);
+    lcd_puts(lcd_buffer);
  
-    sprintf(tmp_buffer,"  Time's Over!  ");
+    sprintf(lcd_buffer,"  Time's Over!  ");
     lcd_gotoxy(0, 1);
-    lcd_puts(tmp_buffer);
+    lcd_puts(lcd_buffer);
 
     delay_ms(SHOW_DELAY);
     time_after(SHOW_DELAY, &hour, &minute, &second, &is_AM);
