@@ -41,21 +41,6 @@ interrupt [TIM1_OVF] void timer1_ovf_isr(void)
     // Reinitialize Timer1 Value
     TCNT1H = 0x85EE >> 8;
     TCNT1L = 0x85EE & 0xff;
-    
-    if(second==59){
-        second=0;
-        if(minute==59){
-            minute=0;
-            if(hour==23)
-                hour=0;
-            else
-                hour++;
-        }
-        else
-            minute++;
-    }
-    else
-        second++;
 }
 
 // External Interrupt 0
