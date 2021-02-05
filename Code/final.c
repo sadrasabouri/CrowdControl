@@ -13,26 +13,23 @@ int minute = 30;
 int hour = 7;
 char is_AM = 1;
 
-int totalcount1_5, nobat1_5;
-int totalcount6, nobat6;
-int totalcount7, nobat7;
+int totalcount1_5, turn1_5;
+int totalcount6, turn6;
+int totalcount7, turn7;
 int TotalCount;
 
-int Counter1, Counter2, Counter3, Counter4, Counter5, Counter6, Counter7; 
-int Show = 0; 
+//  boolean variables set if the Counter is crowded
+char Counter1, Counter2, Counter3, Counter4, Counter5, Counter6, Counter7; 
 
 void time_after(int, int*, int*, int*, char*);
 void LCD_Goto_Counter (int, int);
+void LCD_Show_Waiting (int);
+void LCD_Out_Of_Time();
 char GetKey();
 
 int d1,d2,d3 ,d4,d5,d6 ,d7;
 int entezar;
-void LCD_Goto_Counter (int, int);
-void LCD_Show_Waiting (int);
-
-int saat_yekonim;
-int Show;
-char lcd_buffer[17];
+char is_timeContinue = 1;
 
 
 // Timer Interrupt - NOT WORKING
@@ -51,174 +48,170 @@ interrupt [EXT_INT0] void ext_int0_isr(void)
     GICR |= (1 << INTF0);   //  Enalbe Interrupt Flag
     if(key != 0xFF) // dokme feshorde shod 
     {
-        if (hour < 13 || (hour ==13 && minute<=30 )){
-            saat_yekonim = 1;
-        }else{
-            saat_yekonim = 0 ; 
-        }  
-    switch(key)
+        if (!is_AM)
+            if (hour > 1 || (hour == 1 && minute >= 30 ))
+                is_timeContinue = 0;
+
+        switch(key)
         {
-        case 1 :
-            if (saat_yekonim) {
-                TotalCount += 1;
-                totalcount1_5 += 1;
-                if(Counter1 == 0){
+            case 1:
+                if (is_timeContinue)
+                {
+                    TotalCount += 1;
+                    totalcount1_5 += 1;
+                    if(!Counter1)   //  Is empty
+                    {
+                        Counter1 = 1;
+                        turn1_5 += 1;
+                        LCD_Goto_Counter(turn1_5, 1);
+                    }
+                    else if (!Counter2)
+                    {
+                        Counter2 = 1;
+                        turn1_5 += 1;
+                        LCD_Goto_Counter(turn1_5, 2);
+                    }
+                    else if (!Counter3)
+                    {
+                        Counter3 = 1;
+                        turn1_5 += 1;
+                        LCD_Goto_Counter(turn1_5, 3);
+                    }
+                    else if (!Counter4)
+                    {
+                        Counter4 = 1;
+                        turn1_5 += 1;
+                        LCD_Goto_Counter(turn1_5, 4);
+                    }
+                    else if (!Counter5)
+                    {
+                        Counter5 = 1;
+                        turn1_5 += 1;
+                        LCD_Goto_Counter(turn1_5, 5);
+                    }
+                    else    //  No Counter is empty 
+                    {
+                        entezar = totalcount1_5 - turn1_5; 
+                        LCD_Show_Waiting(entezar);
+                    }
+                }
+                else    //  Running out of time
+                    LCD_Out_Of_Time();
+                break;
+
+            case 2:
+                if(is_timeContinue)
+                {
+                    TotalCount += 1;
+                    totalcount6 += 1;
+                    if(!Counter6)
+                    {
+                        Counter6 = 1;
+                        turn6 += 1;
+                        LCD_Goto_Counter(turn6, 6);
+                    }
+                    else
+                    {
+                        int entezar6 = totalcount6 - turn6; 
+                        LCD_Show_Waiting(entezar6);
+                    }
+                }
+                else
+                    LCD_Out_Of_Time();
+                break;
+
+            case 3: 
+                if(is_timeContinue)
+                {
+                    TotalCount += 1;
+                    totalcount7 += 1;
+                    if(Counter7 == 0){
+                        Counter7 = 1;
+                        turn7 += 1;
+                        LCD_Goto_Counter(turn7, 7);
+                    }
+                    else
+                    {      
+                        int entezar7 = totalcount7 - turn7; 
+                        LCD_Show_Waiting(entezar7);
+                    }
+                }
+                else
+                    LCD_Out_Of_Time();
+                break;
+
+            case 9: // Counter1
+                Counter1 = 0;
+                if (totalcount1_5 > turn1_5)
+                {
+                    d1 = turn1_5 + 1;
+                    LCD_Goto_Counter(d1, 1);
                     Counter1 = 1;
-                    nobat1_5 += 1;
-                    Show = 1;
-                    LCD_Goto_Counter(nobat1_5, 1);
-                    Show = 0;
-                
+                    turn1_5 += 1;
                 }
-                else if (Counter2 == 0){
+                break;
+
+            case 8: // Counter2
+                Counter2 = 0;
+                if (totalcount1_5 > turn1_5)
+                {
+                    d2 = turn1_5 + 1;
+                    LCD_Goto_Counter(d2, 2);
                     Counter2 = 1;
-                    nobat1_5 += 1;
-                    Show = 1;
-                    LCD_Goto_Counter(nobat1_5, 2);
-                    Show = 0;
+                    turn1_5 += 1;
                 }
-                else if (Counter3 == 0){
+                break;
+
+            case 7: // Counter3
+                Counter3 = 0;
+                if (totalcount1_5 > turn1_5)
+                {
+                    d3 = turn1_5 + 1;
+                    LCD_Goto_Counter(d3, 3);
                     Counter3 = 1;
-                    nobat1_5 += 1;
-                    Show = 1;
-                    LCD_Goto_Counter(nobat1_5, 3);
-                    Show = 0;
+                    turn1_5 += 1;
                 }
-                else if (Counter4 == 0){
+                break;
+            case 6: // Counter4
+                Counter4 = 0;
+                if (totalcount1_5 > turn1_5)
+                {
+                    d4 = turn1_5 + 1;
+                    LCD_Goto_Counter(d4, 4) ;
                     Counter4 = 1;
-                    nobat1_5 += 1;
-                    Show = 1;
-                    LCD_Goto_Counter(nobat1_5, 4) ;
-                    Show = 0;
+                    turn1_5 += 1;
                 }
-                else if (Counter5 == 0){
+                break;
+            case 5: // Counter5
+                Counter5 = 0;
+                if (totalcount1_5 > turn1_5)
+                {
+                    d5 = turn1_5 + 1;
+                    LCD_Goto_Counter(d5, 5);
                     Counter5 = 1;
-                    nobat1_5 += 1;
-                    Show = 1;
-                    LCD_Goto_Counter(nobat1_5, 5);
-                    Show = 0;
+                    turn1_5 += 1;
                 }
-                else {
-                    Show = 1;
-                    entezar = totalcount1_5 - nobat1_5; 
-                    LCD_Show_Waiting(entezar);
-                    Show = 0;
-                }
-            }    
-            break;
-        case 2 :
-            if(saat_yekonim){
-                TotalCount += 1;
-                totalcount6 += 1;
-                if(Counter6 == 0){
+                break;
+            case 4: // Counter6
+                Counter6 = 0;
+                if (totalcount6 > turn6)
+                {
+                    d6 = turn6 + 1;
+                    LCD_Goto_Counter(d6, 6);
                     Counter6 = 1;
-                    nobat6 += 1;
-                    Show = 1;
-                    LCD_Goto_Counter(nobat6, 6);
-                    Show = 0;
+                    turn6 += 1;
                 }
-                else {
-                    int entezar6 = totalcount6 - nobat6; 
-                    LCD_Show_Waiting(entezar6);
-                }
-            }
-            break;
-        case 3 : 
-            if(saat_yekonim){
-                TotalCount += 1;
-                totalcount7 += 1;
-                if(Counter7 == 0){
+                break;
+            case 0: // Counter7
+                Counter7 = 0;
+                if (totalcount7 > turn7)
+                {
+                    d7 = turn7 + 1;
+                    LCD_Goto_Counter(d7, 7);
                     Counter7 = 1;
-                    nobat7 += 1;
-                    Show = 1;
-                    LCD_Goto_Counter(nobat7, 7) ;
-                    Show = 0;
+                    turn7 += 1;
                 }
-                else {
-                    
-                    int entezar7 = totalcount7 - nobat7; 
-                    LCD_Show_Waiting(entezar7);
-                }
-            }
-            break;
-        case 9 : //Counter1
-            Counter1 = 0;
-            if (totalcount1_5 > nobat1_5){
-                Show = 1;
-                d1 = nobat1_5 + 1;
-                LCD_Goto_Counter(d1, 1);
-                Counter1 = 1;
-                nobat1_5 += 1;
-                Show = 0;
-            }
-            break;
-        case 8 : //Counter2
-            Counter2 = 0;
-            if (totalcount1_5 > nobat1_5){
-                Show = 1;
-                d2 = nobat1_5 + 1;
-                LCD_Goto_Counter(d2, 2);
-                Counter2 = 1;
-                nobat1_5 += 1;
-                Show = 0;
-            }
-            break;
-        case 7 : //Counter3
-            Counter3 = 0;
-            if (totalcount1_5 > nobat1_5){
-                Show = 1;
-                d3 = nobat1_5 + 1;
-                LCD_Goto_Counter(d3, 3);
-                Counter3 = 1;
-                nobat1_5 += 1;
-                Show = 0;
-            }
-            break;
-        case 6 : //Counter4
-            Counter4 = 0;
-            if (totalcount1_5 > nobat1_5){
-                Show = 1;
-                d4 = nobat1_5 + 1;
-                LCD_Goto_Counter(d4, 4) ;
-                Counter4 = 1;
-                nobat1_5 += 1;
-                Show = 0;
-            }
-            break;
-        case 5 : //Counter5
-            Counter5 = 0;
-            if (totalcount1_5 > nobat1_5){
-                Show = 1;
-                d5 = nobat1_5 + 1;
-                LCD_Goto_Counter(d5, 5);
-                Counter5 = 1;
-                nobat1_5 += 1;
-                Show = 0;
-            }
-            break;
-        case 4 : //Counter6
-            Counter6 = 0;
-            if (totalcount6 > nobat6){
-                Show = 1;
-                d6 = nobat6 + 1;
-                LCD_Goto_Counter(d6, 6);
-                Counter6 = 1;
-                nobat6 += 1;
-                Show = 0;
-            }
-            break;
-        case 0 : //Counter7
-            Counter7 = 0;
-            if (totalcount7 > nobat7){
-                Show = 1;
-                d7 = nobat7 + 1;
-                LCD_Goto_Counter(d7, 7);
-                Counter7 = 1;
-                nobat7 += 1;
-                Show = 0;
-            }
-            break;
-        
+                break;
         }
     }
 }
@@ -226,6 +219,8 @@ interrupt [EXT_INT0] void ext_int0_isr(void)
 
 void main(void)
 {
+    char* lcd_buffer = "";
+
     DDRB = 0xFF;    //  Port B as output - To LCD
     PORTB = 0x00;   //  Initialize it by 0000_0000
     DDRC = 0xF0;    //  Port C as half input half output - From Keypad
@@ -268,13 +263,12 @@ void main(void)
     // Global Enable Interrupts
     #asm("sei")
     
-    totalcount1_5 = 0, nobat1_5 = 0;
-    totalcount6 = 0, nobat6 = 0;
-    totalcount7 = 0, nobat7 = 0;
+    totalcount1_5 = 0, turn1_5 = 0;
+    totalcount6 = 0, turn6 = 0;
+    totalcount7 = 0, turn7 = 0;
     TotalCount = 0;
-    Counter1 = 0, Counter2 = 0, Counter3 = 0, Counter4 = 0, Counter5 = 0, Counter6 = 0, Counter7 = 0; 
-    Show = 0; 
-    saat_yekonim = 0;
+    Counter1 = 0, Counter2 = 0, Counter3 = 0, Counter4 = 0, Counter5 = 0, Counter6 = 0, Counter7 = 0;
+    is_timeContinue = 1;
     lcd_init(16);
 
     while (1)
@@ -350,6 +344,25 @@ void LCD_Show_Waiting(int togo_number)
     lcd_puts(tmp_buffer);
  
     sprintf(tmp_buffer,"   Before You   ", togo_number);
+    lcd_gotoxy(0, 1);
+    lcd_puts(tmp_buffer);
+
+    delay_ms(SHOW_DELAY);
+    time_after(SHOW_DELAY, &hour, &minute, &second, &is_AM);
+    lcd_clear();
+}
+
+void LCD_Out_Of_Time()
+{
+    char* tmp_buffer = "";
+
+    lcd_clear();
+
+    sprintf(tmp_buffer,"    Sorry :(    ");
+    lcd_gotoxy(0, 0);
+    lcd_puts(tmp_buffer);
+ 
+    sprintf(tmp_buffer,"  Time's Over!  ");
     lcd_gotoxy(0, 1);
     lcd_puts(tmp_buffer);
 
