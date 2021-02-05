@@ -30,7 +30,6 @@ int entezar;
 void LCD_Goto_Counter (int, int);
 void LCD_Show_Waiting (int);
 
-int reset = 0;
 int saat_yekonim;
 int Show;
 char lcd_buffer[17];
@@ -62,18 +61,17 @@ interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 // External Interrupt 0
 interrupt [EXT_INT0] void ext_int0_isr(void)
 {
-char k;
-k = GetKey();
-GICR |= (1 << INTF0);
-if(!reset){ 
-        if(k != 0xFF) // dokme feshorde shod 
-      {
+    char key;
+    key = GetKey();
+    GICR |= (1 << INTF0);   //  Enalbe Interrupt Flag
+    if(key != 0xFF) // dokme feshorde shod 
+    {
         if (hour < 13 || (hour ==13 && minute<=30 )){
             saat_yekonim = 1;
         }else{
             saat_yekonim = 0 ; 
         }  
-      switch(k)
+    switch(key)
         {
         case 1 :
             if (saat_yekonim) {
@@ -237,19 +235,8 @@ if(!reset){
             break;
         
         }
-      }
-        
-        }
-        else{
-            totalcount1_5 = 0, nobat1_5 = 0;
-            totalcount6 = 0, nobat6 = 0;
-            totalcount7 = 0, nobat7 = 0;
-            TotalCount = 0;
-            Counter1 = 0, Counter2 = 0, Counter3 = 0, Counter4 = 0, Counter5 = 0, Counter6 = 0, Counter7 = 0; 
-            Show = 0; 
-            //tanzimat saat
-        }
     }
+}
 
 
 void main(void)
