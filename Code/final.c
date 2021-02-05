@@ -18,6 +18,7 @@ int TotalCount;
 int badje1, badje2, badje3, badje4, badje5, badje6, badje7; 
 int namayesh = 0; 
 
+void time_after(int, int*, int*, int*);
 void LCD_namayesh_go_to_badje (int a, int b);
 char GetKey();
 
@@ -249,76 +250,102 @@ if(!reset){
         }
     }
 
-
-//*************************************************************************************************
 void main(void)
 {
-DDRB = 0xFF;
-PORTB = 0x00;
-DDRC = 0xF0;
-PORTC = 0x0F;
-// External Interrupt(s) initialization
-// INT0: On
-// INT0 Mode: Falling Edge
-// INT1: Off
-// INT2: Off
-GICR|=(0<<INT1) | (1<<INT0) | (0<<INT2);
-MCUCR=(0<<ISC11) | (0<<ISC10) | (1<<ISC01) | (0<<ISC00);
-MCUCSR=(0<<ISC2);
-GIFR=(0<<INTF1) | (1<<INTF0) | (0<<INTF2);
-////==============================================timer initiallize
-// Timer/Counter 1 initialization
-// Clock source: System Clock
-// Clock value: 31/250 kHz
-// Mode: Normal top=0xFFFF
-// OC1A output: Disconnected
-// OC1B output: Disconnected
-// Noise Canceler: Off
-// Input Capture on Falling Edge
-// Timer Period: 1 s
-// Timer1 Overflow Interrupt: On
-// Input Capture Interrupt: Off
-// Compare A Match Interrupt: Off
-// Compare B Match Interrupt: Off
-TCCR1A=(0<<COM1A1) | (0<<COM1A0) | (0<<COM1B1) | (0<<COM1B0) | (0<<WGM11) | (0<<WGM10);
-TCCR1B=(0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (0<<WGM12) | (1<<CS12) | (0<<CS11) | (0<<CS10);
-TCNT1H=0x85;
-TCNT1L=0xEE;
-ICR1H=0x00;
-ICR1L=0x00;
-OCR1AH=0x00;
-OCR1AL=0x00;
-OCR1BH=0x00;
-OCR1BL=0x00;
-// Global enable interrupts
-#asm("sei")
-//============================================================
-totalcount1_5 = 0, nobat1_5 = 0;
-totalcount6 = 0, nobat6 = 0;
-totalcount7 = 0, nobat7 = 0;
-TotalCount = 0;
-badje1 = 0, badje2 = 0, badje3 = 0, badje4 = 0, badje5 = 0, badje6 = 0, badje7 = 0; 
-namayesh = 0; 
-saat_yekonim = 0;
-lcd_init(16);
-second = 0 ; 
-//======================================================================================
-while (1)
+    DDRB = 0xFF;    //  Port B as output - To LCD
+    PORTB = 0x00;   //  Initialize it by 0000_0000
+    DDRC = 0xF0;    //  Port C as half input half output - From Keypad
+    PORTC = 0x0F;   //  Initialize it by 0000_1111
+
+    // External Interrupt(s) initialization
+    // INT0: On
+    // INT0 Mode: Falling Edge
+    // INT1: Off
+    // INT2: Off
+    GICR |= (0<<INT1) | (1<<INT0) | (0<<INT2);
+    MCUCR = (0<<ISC11) | (0<<ISC10) | (1<<ISC01) | (0<<ISC00);
+    MCUCSR = (0<<ISC2);
+    GIFR = (0<<INTF1) | (1<<INTF0) | (0<<INTF2);
+    
+    // Timer/Counter 1 initialization
+    // Clock source: System Clock
+    // Clock value: 31/250 kHz
+    // Mode: Normal top=0xFFFF
+    // OC1A output: Disconnected
+    // OC1B output: Disconnected
+    // Noise Canceler: Off
+    // Input Capture on Falling Edge
+    // Timer Period: 1 s
+    // Timer1 Overflow Interrupt: On
+    // Input Capture Interrupt: Off
+    // Compare A Match Interrupt: Off
+    // Compare B Match Interrupt: Off
+    TCCR1A = (0<<COM1A1) | (0<<COM1A0) | (0<<COM1B1) | (0<<COM1B0) | (0<<WGM11) | (0<<WGM10);
+    TCCR1B = (0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (0<<WGM12) | (1<<CS12) | (0<<CS11) | (0<<CS10);
+    TCNT1H = 0x85;
+    TCNT1L = 0xEE;
+    ICR1H = 0x00;
+    ICR1L = 0x00;
+    OCR1AH = 0x00;
+    OCR1AL = 0x00;
+    OCR1BH = 0x00;
+    OCR1BL = 0x00;
+
+    // Global Enable Interrupts
+    #asm("sei")
+    
+    totalcount1_5 = 0, nobat1_5 = 0;
+    totalcount6 = 0, nobat6 = 0;
+    totalcount7 = 0, nobat7 = 0;
+    TotalCount = 0;
+    badje1 = 0, badje2 = 0, badje3 = 0, badje4 = 0, badje5 = 0, badje6 = 0, badje7 = 0; 
+    namayesh = 0; 
+    saat_yekonim = 0;
+    lcd_init(16);
+    second = 0 ; 
+    
+    while (1)
+        {
+            if (hour == 1 || hour == 12)
+                sprintf(lcd_buffer,"   %02d:%02d:%02d  PM", hour, minute, second);
+            else
+                sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute, second);
+            lcd_gotoxy(0,0);
+            lcd_puts(lcd_buffer);
+            delay_ms(1000);
+            time_after(1000, &hour, &minute, &second);
+            lcd_clear();
+    }
+}
+
+void time_after(int n, int* pthour, int* ptminute, int* ptsecond)
+{
+    unsigned char second = *ptsecond;
+    unsigned char minute = *ptminute;
+    unsigned char hour = *pthour;
+
+    n = n / 1000;    
+    second += n;
+    if (second > 59)
     {
-        if (hour == 1 || hour == 12)
-            sprintf(lcd_buffer,"   %02d:%02d:%02d  PM", hour, minute,second);
-        else
-            sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute,second);
-        lcd_gotoxy(0,0);
-        lcd_puts(lcd_buffer);
-        delay_ms(1000);
-        lcd_clear();      
+        minute += 1;
+        second = second % 60;
+    }
+    if (minute > 59)
+    {
+        hour += 1;
+        minute = minute % 60;
+    }
+
+    *ptsecond = second;
+    *ptminute = minute;
+    *pthour = hour;
 }
-}
-//========================================================================================
-void LCD_namayesh_go_to_badje (int a, int b){
+
+void LCD_namayesh_go_to_badje (int a, int b)
+{
     lcd_clear(); 
-    str1[10]; 
+    str1[10];
     itoa(a, str1);
     lcd_gotoxy(0, 0);
     lcd_puts(str1);
