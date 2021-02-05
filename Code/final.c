@@ -324,7 +324,7 @@ void time_after(int n, int* pthour, int* ptminute, int* ptsecond)
     unsigned char minute = *ptminute;
     unsigned char hour = *pthour;
 
-    n = n / 1000;    
+    n = n / 1000;
     second += n;
     if (second > 59)
     {
@@ -336,6 +336,8 @@ void time_after(int n, int* pthour, int* ptminute, int* ptsecond)
         hour += 1;
         minute = minute % 60;
     }
+    if (hour > 12)
+        hour = hour % 12;
 
     *ptsecond = second;
     *ptminute = minute;

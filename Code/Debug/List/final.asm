@@ -1476,7 +1476,7 @@ _0x10:
 	LDI  R27,0
 	RCALL _LCD_namayesh_go_to_badje
 ; 0000 0056                     namayesh = 0;
-	RJMP _0x67
+	RJMP _0x68
 ; 0000 0057 
 ; 0000 0058                 }
 ; 0000 0059                 else if (badje2 == 0){
@@ -1495,7 +1495,7 @@ _0x16:
 	LDI  R27,0
 	RCALL _LCD_namayesh_go_to_badje
 ; 0000 005E                     namayesh = 0;
-	RJMP _0x67
+	RJMP _0x68
 ; 0000 005F                 }
 ; 0000 0060                 else if (badje3 == 0){
 _0x18:
@@ -1513,7 +1513,7 @@ _0x18:
 	LDI  R27,0
 	RCALL _LCD_namayesh_go_to_badje
 ; 0000 0065                     namayesh = 0;
-	RJMP _0x67
+	RJMP _0x68
 ; 0000 0066                 }
 ; 0000 0067                 else if (badje4 == 0){
 _0x1A:
@@ -1531,7 +1531,7 @@ _0x1A:
 	LDI  R27,0
 	RCALL _LCD_namayesh_go_to_badje
 ; 0000 006C                     namayesh = 0;
-	RJMP _0x67
+	RJMP _0x68
 ; 0000 006D                 }
 ; 0000 006E                 else if (badje5 == 0){
 _0x1C:
@@ -1549,7 +1549,7 @@ _0x1C:
 	LDI  R27,0
 	RCALL _LCD_namayesh_go_to_badje
 ; 0000 0073                     namayesh = 0;
-	RJMP _0x67
+	RJMP _0x68
 ; 0000 0074                 }
 ; 0000 0075                 else {
 _0x1E:
@@ -1566,7 +1566,7 @@ _0x1E:
 	LDS  R27,_entezar+1
 	RCALL _LCD_namayesh_entezar
 ; 0000 0079                     namayesh = 0;
-_0x67:
+_0x68:
 	LDI  R30,LOW(0)
 	CALL SUBOPT_0x9
 ; 0000 007A                 }
@@ -2086,7 +2086,7 @@ _0x3B:
 	ST   -Y,R31
 	ST   -Y,R30
 	__POINTW1FN _0x0,0
-	RJMP _0x68
+	RJMP _0x69
 ; 0000 0137             else
 _0x3A:
 ; 0000 0138                 sprintf(lcd_buffer,"   %02d:%02d:%02d  AM", hour, minute, second);
@@ -2095,7 +2095,7 @@ _0x3A:
 	ST   -Y,R31
 	ST   -Y,R30
 	__POINTW1FN _0x0,22
-_0x68:
+_0x69:
 	ST   -Y,R31
 	ST   -Y,R30
 	MOVW R30,R8
@@ -2209,48 +2209,59 @@ _0x3F:
 	CALL __MODW21
 	MOV  R16,R30
 ; 0000 0152     }
-; 0000 0153 
-; 0000 0154     *ptsecond = second;
+; 0000 0153     if (hour > 12)
 _0x40:
+	CPI  R19,13
+	BRLO _0x41
+; 0000 0154         hour = hour % 12;
+	MOV  R26,R19
+	CLR  R27
+	LDI  R30,LOW(12)
+	LDI  R31,HIGH(12)
+	CALL __MODW21
+	MOV  R19,R30
+; 0000 0155 
+; 0000 0156     *ptsecond = second;
+_0x41:
 	MOV  R30,R17
 	LDD  R26,Y+4
 	LDD  R27,Y+4+1
 	LDI  R31,0
 	ST   X+,R30
 	ST   X,R31
-; 0000 0155     *ptminute = minute;
+; 0000 0157     *ptminute = minute;
 	MOV  R30,R16
 	LDD  R26,Y+6
 	LDD  R27,Y+6+1
 	LDI  R31,0
 	ST   X+,R30
 	ST   X,R31
-; 0000 0156     *pthour = hour;
+; 0000 0158     *pthour = hour;
 	MOV  R30,R19
 	LDD  R26,Y+8
 	LDD  R27,Y+8+1
 	LDI  R31,0
 	ST   X+,R30
 	ST   X,R31
-; 0000 0157 }
+; 0000 0159 }
 	CALL __LOADLOCR4
 	ADIW R28,12
 	RET
 ; .FEND
 ;
 ;void LCD_namayesh_go_to_badje (int a, int b)
-; 0000 015A {
+; 0000 015C {
 _LCD_namayesh_go_to_badje:
 ; .FSTART _LCD_namayesh_go_to_badje
-; 0000 015B     lcd_clear();
+; 0000 015D     lcd_clear();
 	ST   -Y,R27
 	ST   -Y,R26
 ;	a -> Y+2
 ;	b -> Y+0
 	CALL _lcd_clear
-; 0000 015C     str1[10];
+; 0000 015E     str1[10];
 	__GETB1MN _str1,10
-; 0000 015D     itoa(a, str1);
+; 0000 015F     itoa(a, str1);
 	LDD  R30,Y+2
 	LDD  R31,Y+2+1
 	ST   -Y,R31
@@ -2258,19 +2269,19 @@ _LCD_namayesh_go_to_badje:
 	LDI  R26,LOW(_str1)
 	LDI  R27,HIGH(_str1)
 	CALL _itoa
-; 0000 015E     lcd_gotoxy(0, 0);
+; 0000 0160     lcd_gotoxy(0, 0);
 	CALL SUBOPT_0x1A
-; 0000 015F     lcd_puts(str1);
+; 0000 0161     lcd_puts(str1);
 	LDI  R26,LOW(_str1)
 	LDI  R27,HIGH(_str1)
 	CALL _lcd_puts
-; 0000 0160     lcd_gotoxy(5, 0);
+; 0000 0162     lcd_gotoxy(5, 0);
 	LDI  R30,LOW(5)
 	CALL SUBOPT_0x1C
-; 0000 0161     lcd_putsf("go to badje : ");
+; 0000 0163     lcd_putsf("go to badje : ");
 	__POINTW2FN _0x0,44
 	CALL _lcd_putsf
-; 0000 0162     itoa(b, str2);
+; 0000 0164     itoa(b, str2);
 	LD   R30,Y
 	LDD  R31,Y+1
 	ST   -Y,R31
@@ -2278,33 +2289,33 @@ _LCD_namayesh_go_to_badje:
 	LDI  R26,LOW(_str2)
 	LDI  R27,HIGH(_str2)
 	CALL _itoa
-; 0000 0163     lcd_gotoxy(15, 0);
+; 0000 0165     lcd_gotoxy(15, 0);
 	LDI  R30,LOW(15)
 	CALL SUBOPT_0x1C
-; 0000 0164     lcd_puts(str2);
+; 0000 0166     lcd_puts(str2);
 	LDI  R26,LOW(_str2)
 	LDI  R27,HIGH(_str2)
 	CALL SUBOPT_0x1B
-; 0000 0165     delay_ms(1000);
-; 0000 0166     lcd_clear();
+; 0000 0167     delay_ms(1000);
+; 0000 0168     lcd_clear();
 	CALL _lcd_clear
-; 0000 0167 }
+; 0000 0169 }
 	ADIW R28,4
 	RET
 ; .FEND
 ;//==========================================================================================
 ;void LCD_namayesh_entezar (int a){
-; 0000 0169 void LCD_namayesh_entezar (int a){
+; 0000 016B void LCD_namayesh_entezar (int a){
 _LCD_namayesh_entezar:
 ; .FSTART _LCD_namayesh_entezar
-; 0000 016A     lcd_clear();
+; 0000 016C     lcd_clear();
 	ST   -Y,R27
 	ST   -Y,R26
 ;	a -> Y+0
 	CALL _lcd_clear
-; 0000 016B     str3[17];
+; 0000 016D     str3[17];
 	__GETB1MN _str3,17
-; 0000 016C     itoa(a, str3);
+; 0000 016E     itoa(a, str3);
 	LD   R30,Y
 	LDD  R31,Y+1
 	ST   -Y,R31
@@ -2312,25 +2323,25 @@ _LCD_namayesh_entezar:
 	LDI  R26,LOW(_str3)
 	LDI  R27,HIGH(_str3)
 	CALL _itoa
-; 0000 016D     lcd_gotoxy(0, 0);
+; 0000 016F     lcd_gotoxy(0, 0);
 	CALL SUBOPT_0x1A
-; 0000 016E     lcd_puts(str1);
+; 0000 0170     lcd_puts(str1);
 	LDI  R26,LOW(_str1)
 	LDI  R27,HIGH(_str1)
 	CALL _lcd_puts
-; 0000 016F     lcd_gotoxy(4, 0);
+; 0000 0171     lcd_gotoxy(4, 0);
 	LDI  R30,LOW(4)
 	CALL SUBOPT_0x1C
-; 0000 0170     lcd_putsf(" nafar joloye shoma hastand");
+; 0000 0172     lcd_putsf(" nafar joloye shoma hastand");
 	__POINTW2FN _0x0,59
 	CALL _lcd_putsf
-; 0000 0171     delay_ms(500);
+; 0000 0173     delay_ms(500);
 	LDI  R26,LOW(500)
 	LDI  R27,HIGH(500)
 	CALL _delay_ms
-; 0000 0172     lcd_clear();
+; 0000 0174     lcd_clear();
 	CALL _lcd_clear
-; 0000 0173 }
+; 0000 0175 }
 	JMP  _0x20C0003
 ; .FEND
 ;//=========================================================================================
@@ -2338,13 +2349,13 @@ _LCD_namayesh_entezar:
 ;
 ;//=========================================================================================
 ;char GetKey()
-; 0000 0179 {
+; 0000 017B {
 _GetKey:
 ; .FSTART _GetKey
-; 0000 017A unsigned char key_code = 0xFF;
-; 0000 017B unsigned char columns;
-; 0000 017C 
-; 0000 017D PORTC = 0xFF;
+; 0000 017C unsigned char key_code = 0xFF;
+; 0000 017D unsigned char columns;
+; 0000 017E 
+; 0000 017F PORTC = 0xFF;
 	ST   -Y,R17
 	ST   -Y,R16
 ;	key_code -> R17
@@ -2352,132 +2363,132 @@ _GetKey:
 	LDI  R17,255
 	LDI  R30,LOW(255)
 	OUT  0x15,R30
-; 0000 017E // first row
-; 0000 017F PORTC.4 = 0;
+; 0000 0180 // first row
+; 0000 0181 PORTC.4 = 0;
 	CBI  0x15,4
-; 0000 0180 columns = PINC & 0x07;
+; 0000 0182 columns = PINC & 0x07;
 	CALL SUBOPT_0x1D
-; 0000 0181 if(columns != 0x07)
-	BREQ _0x43
-; 0000 0182   {
-; 0000 0183   switch(columns)
+; 0000 0183 if(columns != 0x07)
+	BREQ _0x44
+; 0000 0184   {
+; 0000 0185   switch(columns)
 	CALL SUBOPT_0x1E
-; 0000 0184     {
-; 0000 0185     case 0b110 : key_code = 1; break;
-	BRNE _0x47
-	LDI  R17,LOW(1)
-	RJMP _0x46
-; 0000 0186     case 0b101 : key_code = 2; break;
-_0x47:
-	CPI  R30,LOW(0x5)
-	LDI  R26,HIGH(0x5)
-	CPC  R31,R26
+; 0000 0186     {
+; 0000 0187     case 0b110 : key_code = 1; break;
 	BRNE _0x48
-	LDI  R17,LOW(2)
-	RJMP _0x46
-; 0000 0187     case 0b011 : key_code = 3; break;
+	LDI  R17,LOW(1)
+	RJMP _0x47
+; 0000 0188     case 0b101 : key_code = 2; break;
 _0x48:
+	CPI  R30,LOW(0x5)
+	LDI  R26,HIGH(0x5)
+	CPC  R31,R26
+	BRNE _0x49
+	LDI  R17,LOW(2)
+	RJMP _0x47
+; 0000 0189     case 0b011 : key_code = 3; break;
+_0x49:
 	CPI  R30,LOW(0x3)
 	LDI  R26,HIGH(0x3)
 	CPC  R31,R26
-	BRNE _0x46
+	BRNE _0x47
 	LDI  R17,LOW(3)
-; 0000 0188     }
-_0x46:
-; 0000 0189   }
-; 0000 018A PORTC.4 = 1;
-_0x43:
+; 0000 018A     }
+_0x47:
+; 0000 018B   }
+; 0000 018C PORTC.4 = 1;
+_0x44:
 	SBI  0x15,4
-; 0000 018B // second row
-; 0000 018C PORTC.5 = 0;
+; 0000 018D // second row
+; 0000 018E PORTC.5 = 0;
 	CBI  0x15,5
-; 0000 018D columns = PINC & 0x07;
+; 0000 018F columns = PINC & 0x07;
 	CALL SUBOPT_0x1D
-; 0000 018E if(columns != 0x07)
-	BREQ _0x4E
-; 0000 018F   {
-; 0000 0190   switch(columns)
+; 0000 0190 if(columns != 0x07)
+	BREQ _0x4F
+; 0000 0191   {
+; 0000 0192   switch(columns)
 	CALL SUBOPT_0x1E
-; 0000 0191     {
-; 0000 0192     case 0b110 : key_code = 4; break;
-	BRNE _0x52
-	LDI  R17,LOW(4)
-	RJMP _0x51
-; 0000 0193     case 0b101 : key_code = 5; break;
-_0x52:
-	CPI  R30,LOW(0x5)
-	LDI  R26,HIGH(0x5)
-	CPC  R31,R26
+; 0000 0193     {
+; 0000 0194     case 0b110 : key_code = 4; break;
 	BRNE _0x53
-	LDI  R17,LOW(5)
-	RJMP _0x51
-; 0000 0194     case 0b011 : key_code = 6; break;
+	LDI  R17,LOW(4)
+	RJMP _0x52
+; 0000 0195     case 0b101 : key_code = 5; break;
 _0x53:
-	CPI  R30,LOW(0x3)
-	LDI  R26,HIGH(0x3)
-	CPC  R31,R26
-	BRNE _0x51
-	LDI  R17,LOW(6)
-; 0000 0195     }
-_0x51:
-; 0000 0196   }
-; 0000 0197 PORTC.5 = 1;
-_0x4E:
-	SBI  0x15,5
-; 0000 0198 // third row
-; 0000 0199 PORTC.6 = 0;
-	CBI  0x15,6
-; 0000 019A columns = PINC & 0x07;
-	CALL SUBOPT_0x1D
-; 0000 019B if(columns != 0x07)
-	BREQ _0x59
-; 0000 019C   {
-; 0000 019D   switch(columns)
-	CALL SUBOPT_0x1E
-; 0000 019E     {
-; 0000 019F     case 0b110 : key_code = 7; break;
-	BRNE _0x5D
-	LDI  R17,LOW(7)
-	RJMP _0x5C
-; 0000 01A0     case 0b101 : key_code = 8; break;
-_0x5D:
 	CPI  R30,LOW(0x5)
 	LDI  R26,HIGH(0x5)
 	CPC  R31,R26
-	BRNE _0x5E
-	LDI  R17,LOW(8)
-	RJMP _0x5C
-; 0000 01A1     case 0b011 : key_code = 9; break;
-_0x5E:
+	BRNE _0x54
+	LDI  R17,LOW(5)
+	RJMP _0x52
+; 0000 0196     case 0b011 : key_code = 6; break;
+_0x54:
 	CPI  R30,LOW(0x3)
 	LDI  R26,HIGH(0x3)
 	CPC  R31,R26
-	BRNE _0x5C
+	BRNE _0x52
+	LDI  R17,LOW(6)
+; 0000 0197     }
+_0x52:
+; 0000 0198   }
+; 0000 0199 PORTC.5 = 1;
+_0x4F:
+	SBI  0x15,5
+; 0000 019A // third row
+; 0000 019B PORTC.6 = 0;
+	CBI  0x15,6
+; 0000 019C columns = PINC & 0x07;
+	CALL SUBOPT_0x1D
+; 0000 019D if(columns != 0x07)
+	BREQ _0x5A
+; 0000 019E   {
+; 0000 019F   switch(columns)
+	CALL SUBOPT_0x1E
+; 0000 01A0     {
+; 0000 01A1     case 0b110 : key_code = 7; break;
+	BRNE _0x5E
+	LDI  R17,LOW(7)
+	RJMP _0x5D
+; 0000 01A2     case 0b101 : key_code = 8; break;
+_0x5E:
+	CPI  R30,LOW(0x5)
+	LDI  R26,HIGH(0x5)
+	CPC  R31,R26
+	BRNE _0x5F
+	LDI  R17,LOW(8)
+	RJMP _0x5D
+; 0000 01A3     case 0b011 : key_code = 9; break;
+_0x5F:
+	CPI  R30,LOW(0x3)
+	LDI  R26,HIGH(0x3)
+	CPC  R31,R26
+	BRNE _0x5D
 	LDI  R17,LOW(9)
-; 0000 01A2     }
-_0x5C:
-; 0000 01A3   }
-; 0000 01A4 PORTC.6 = 1;
-_0x59:
+; 0000 01A4     }
+_0x5D:
+; 0000 01A5   }
+; 0000 01A6 PORTC.6 = 1;
+_0x5A:
 	SBI  0x15,6
-; 0000 01A5 // fourth row
-; 0000 01A6 PORTC.7 = 0;
+; 0000 01A7 // fourth row
+; 0000 01A8 PORTC.7 = 0;
 	CBI  0x15,7
-; 0000 01A7 if(!PINC.1) key_code = 0;
+; 0000 01A9 if(!PINC.1) key_code = 0;
 	SBIS 0x13,1
 	LDI  R17,LOW(0)
-; 0000 01A8 PORTC.7 = 1;
+; 0000 01AA PORTC.7 = 1;
 	SBI  0x15,7
-; 0000 01A9 
-; 0000 01AA PORTC = 0x0F;
+; 0000 01AB 
+; 0000 01AC PORTC = 0x0F;
 	LDI  R30,LOW(15)
 	OUT  0x15,R30
-; 0000 01AB return key_code;
+; 0000 01AD return key_code;
 	MOV  R30,R17
 	LD   R16,Y+
 	LD   R17,Y+
 	RET
-; 0000 01AC }
+; 0000 01AE }
 ; .FEND
 	#ifndef __SLEEP_DEFINED__
 	#define __SLEEP_DEFINED__
